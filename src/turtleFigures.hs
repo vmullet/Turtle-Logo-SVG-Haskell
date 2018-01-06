@@ -27,15 +27,15 @@ drawMill canvas wingLength = execOrders (buildWorld canvas) [TL 45,Repeat 4 [TR 
 -- Int : Total Length of the fractale (at n = 0)
 fractaleKnock :: Int -> Int -> [Order]
 fractaleKnock n fractLength | n == 0 = [MF fractLength]
-                           | otherwise = recur ++ [TL 60] ++ recur ++ [TR 120] ++ recur ++ [TL 60] ++ recur
-                           where recur = fractaleKnock (n-1) (round(fromIntegral fractLength / 3.0))
+                            | otherwise = recur ++ [TL 60] ++ recur ++ [TR 120] ++ recur ++ [TL 60] ++ recur
+                            where recur = fractaleKnock (n-1) (round(fromIntegral fractLength / 3.0))
 
 -- Function to draw the snowFlake by using the fractale function
 -- Int : Recursive counter
 -- Int : Total Length of the fractale (at n = 0)
 drawSnowFlake :: Canvas -> Int -> Int -> World
 drawSnowFlake canvas n fractLength = execOrders (buildWorld canvas) ([Repeat 2 (fractale ++ [TR 120])] ++ fractale)
-                                     where fractale = fractaleKoch n fractLength
+                                     where fractale = fractaleKnock n fractLength
 
 
 main = do
