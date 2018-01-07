@@ -8,7 +8,7 @@ drawSquare = execProg [
                         Build (500,500),
                         Declare
                         [
-                        "length" := Val 150
+                          "length" := Val 150
                         ],
                         Repeat (Val 4)
                         [
@@ -60,8 +60,7 @@ drawMill = execProg [
                         RP True
                       ]
                     ]
-                    where halfLength = (Function "halfReduce" (Var "wingLength"))
-
+                    where halfLength = Function "halfReduce" (Var "wingLength")
 
 main = do
     --let snowFlake = drawSnowFlake (1200,1200) 4 600
