@@ -19,14 +19,15 @@ type Coordinate = (Int,Int)
 type Color = (Int,Int,Int)
 
 -- The different possible shapes
-data Shape = Rectangle Coordinate Int Int Color 
+data Shape = Rectangle Coordinate Int Int Color
             | Circle Coordinate Int Color
-            | Line Coordinate Coordinate Color 
+            | Line Coordinate Coordinate Color
             | PolyLine [Coordinate] Color
-            | Polygon [Coordinate] Color
+            | Polygon [Coordinate] Color 
+            deriving Show
 
 -- Image is an array of Shape
-data Image = Image Canvas [Shape]
+data Image = Image Canvas [Shape] deriving Show
 
 -- Function for static parts of a SVG file
 headerSVG :: String
