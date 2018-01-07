@@ -1,8 +1,6 @@
 import BinTurtle
 
 -- Function to draw a square
--- Canvas : The world resolution
--- Int : The LengthSide of the square
 drawSquare :: World
 drawSquare = execProg [
                         Build (500,500),
@@ -18,7 +16,6 @@ drawSquare = execProg [
                       ]
 
 -- Function to draw any regular polygon whatever the number of sides
--- Canvas : The world resolution
 drawRegularPolygon :: World
 drawRegularPolygon = execProg [
                                 Build (1300,1300),
