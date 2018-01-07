@@ -3,11 +3,9 @@ module BinTurtle(
     Cap,
     Var,
     Order(TL,TR,MF,MB,RP,Clear,Repeat,Declare,Build),
-    Turtle(Turtle),
     World(World),
     Expr(Var,Val,Function,(:+:),(:-:),(:*:),(:/:),Neg),
     Stmt((:=),(:->)),
-    buildWorld,
     execProg,
     writeWorldToSVG
 )
@@ -64,9 +62,11 @@ instance Eq Expr where
 data Stmt = Var := Expr -- Declare and store variables in the memory
           | Var :-> Function -- Declare and store functions in the engine
 
+-- Function to retrieve a function by the variable name in the engine
 getFunction :: Var -> Engine -> Function
 getFunction var engine = fromMaybe (error ("Variable not affected to a function ")) (lookup var engine)
 
+-- Function to evaluate an expression
 eval :: Expr -> Storage -> Val
 eval (Val v) _ = v
 eval (Var x) (memory,_) = fromMaybe (error ("Variable not affected to a value ")) (lookup x memory)
@@ -77,13 +77,13 @@ eval (e1 :*: e2) store = eval e1 store * eval e2 store
 eval (e1 :/: e2) store = eval e1 store `div` eval e2 store
 eval (Neg e1) store = -(eval e1 store)
 
--- Execution of a single statement (The storage is updated)
+-- Function to execute a single statement (The storage is updated)
 execStmt :: Stmt -> Storage -> Storage
 execStmt (x := expr) (m,e) = if (existMemVar x m) then (updateMemVar x (eval expr (m,e)) m, e) else ((x,eval expr (m,e)) : m, e) -- The variable is added or updated
-execStmt (x :-> funct) (m,e) = (m,(x,funct) : e)          -- The enfine is updated
+execStmt (x :-> funct) (m,e) = (m,(x,funct) : e)  -- The engine is updated
 
 
--- Execution of an array of statements
+-- Function to execute an array of statements
 execStmts :: [Stmt] -> Storage -> Storage
 execStmts t store = foldl (flip execStmt) store t
 -------------------------------------------------
@@ -101,11 +101,11 @@ updateMemVar var newVal ((name,val):t) = if (var == name) then (name,newVal):t e
 toRadian :: Int -> Float
 toRadian degree = fromIntegral degree * pi / 180.0
 
--- Function to create the world and set the turtle in the middle
+-- Function to create the world and set the turtle in the middle (used for Build and Clear Orders)
 buildWorld :: Canvas -> World
 buildWorld (width,height) = World(Turtle(quot width 2,quot width 2) 0 True) (Image (width,height) []) ([],[])
 
--- Function to create an emptyWorld
+-- Function to create an emptyWorld (base parameter for the execOrders function)
 emptyWorld :: World
 emptyWorld = World(Turtle(0,0) 0 False) (Image (0,0) []) ([],[])
 
@@ -114,12 +114,13 @@ emptyWorld = World(Turtle(0,0) 0 False) (Image (0,0) []) ([],[])
 execOrder :: Order -> World -> World
 execOrder (Build canvas) _ = buildWorld canvas -- Order to build the world
 execOrder (TL angle) (World (Turtle (tx,ty) cap pen) image store) = World (Turtle (tx,ty) ((cap - eval angle store) `mod` 360) pen) image store
-execOrder (TR angle) world = execOrder (TL (Neg angle)) world
+execOrder (TR angle) world = execOrder (TL (Neg angle)) world -- Turn Right = Opposite of Turn Left
 execOrder (MF pixels) (World (Turtle (tx,ty) cap pen) image store) | pen = World (Turtle (endX,endY) cap pen) (addShapeToImage (Line (tx,ty) (endX,endY) (0,0,0)) image) store
                                                                    | otherwise = World (Turtle (endX,endY) cap pen) image store
                                                                      where endX = tx + round (cos (toRadian cap) * fromIntegral (eval pixels store))
                                                                            endY = ty + round (sin (toRadian cap) * fromIntegral (eval pixels store))
-execOrder (MB pixels) world = execOrder (MF (Neg pixels)) world
+
+execOrder (MB pixels) world = execOrder (MF (Neg pixels)) world -- Move Backward = Opposite of Move Forward
 execOrder (RP statePen) (World (Turtle (tx,ty) cap _) image store) = World (Turtle (tx,ty) cap statePen) image store
 execOrder Clear (World _ (Image canvas _) _) = buildWorld canvas -- Reset screen and turtle
 
@@ -130,15 +131,17 @@ execOrder (Repeat count orders) (World turtle image storage) | valCount > 0 = ex
                                                                    valCount = eval count storage 
 
 -- Add the possibility to declare functions and variables
-execOrder (Declare stmt) (World turtle image storage) = World turtle image (execStmts stmt storage)
+execOrder (Declare stmts) (World turtle image storage) = World turtle image (execStmts stmts storage)
 
 
 -- Function to execute a list of orders by the turtle in the world
 execOrders :: World -> [Order] -> World
 execOrders = foldl (flip execOrder)
 
--- The main function to execute a list of orders (The baseWorld is a emptyWorld as it will be initialized by a "Build" order)
+-- The main function to execute a list of orders 
+-- N.B : The baseWorld is an emptyWorld as everything will be initialized by a "Build" order)
 execProg :: [Order] -> World
+execProg [] = emptyWorld
 execProg orders = execOrders emptyWorld orders
 
 -- Function to export the world into a SVG file
