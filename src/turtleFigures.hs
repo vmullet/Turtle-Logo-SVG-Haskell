@@ -59,9 +59,71 @@ drawMill = execProg [
                     ]
                     where halfLength = Function "halfReduce" (Var "wingLength")
 
+fractaleKoch :: Expr -> Order
+fractaleKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
+                     where  recur = fractaleKoch (count :-: Val 1)
+                            ifnot = [
+                                      recur,
+                                      TL (Val 60),
+                                      recur,
+                                      TR (Val 120),
+                                      recur,
+                                      TL (Val 60),
+                                      recur
+                                    ]
+
+drawSnowFlake :: World
+drawSnowFlake = execProg  [
+                            Build (1200,1200),
+                            Declare
+                            [
+                              "n" := Val 4,
+                              "baseLength" := Val 600,
+                              -- For calculation
+                              "3powerN" :-> (\x -> 3^x),
+                              "fractLength" := ((Var "baseLength") :/: (Function "3powerN" (Var "n")))
+                            ],
+                            Repeat (Val 2)
+                            [
+                              fractale,
+                              resetCount,
+                              TR (Val 120)
+                            ],
+                            fractale,
+                            resetCount
+                          ]
+                          where fractale = fractaleKoch (Var "n")
+                                resetCount = Declare ["n" := Val 4]
+
+-- Function to draw a spiral
+drawSpiral :: World
+drawSpiral = execProg [
+                        Build (1200,1200),
+                        Declare
+                        [
+                          "length" := Val 500,
+                          "depth" := Val 300, -- Depth of the spiral (number of nested squares)
+                          "reduceSquare" :-> (\x -> x - x `div` 20) -- Square length reduced of 5% every nested dquare
+                        ],
+                        TL (Val 90),
+                        Repeat (Var "depth")
+                        [
+                          Repeat (Val 2)
+                          [
+                            MF (Var "length"),
+                            TR (Val 90)
+                          ],
+                          Declare
+                          [
+                            "length" := Function "reduceSquare" (Var "length") -- Update length variable
+                          ]
+                        ]
+                      ]
+
+
 main = do
-    --let snowFlake = drawSnowFlake (1200,1200) 4 600
     writeWorldToSVG drawSquare "C:\\Etc\\square.svg"
     writeWorldToSVG drawRegularPolygon "C:\\Etc\\polygReg.svg"
     writeWorldToSVG drawMill "C:\\Etc\\mill.svg"
-    --writeWorldToSVG snowFlake "C:\\Etc\\snowFlake.svg"
+    writeWorldToSVG drawSpiral "C:\\Etc\\mill.svg"
+    writeWorldToSVG drawSnowFlake "C:\\Etc\\snowFlake.svg"

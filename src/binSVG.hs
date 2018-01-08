@@ -43,6 +43,7 @@ canvasToString (width,height) = "<svg width='" ++ show width ++ "' height='" ++ 
 colorToString :: Color -> String
 colorToString (red,green,blue) = "rgb(" ++ show red ++ ", " ++ show green ++ ", " ++ show blue ++ ")"
 
+-- Useful only for polyline and polygons
 coordArrayToString :: [Coordinate] -> String
 coordArrayToString [] = ""
 coordArrayToString ((hx,hy):t) = show hx ++ " " ++ show hy ++ " " ++ coordArrayToString t

@@ -2,9 +2,9 @@ module BinTurtle(
     Canvas,
     Cap,
     Var,
-    Order(TL,TR,MF,MB,RP,Clear,Repeat,Declare,Build),
+    Order(TL,TR,MF,MB,RP,Clear,Repeat,Declare,Build,IF),
     World(World),
-    Expr(Var,Val,Function,(:+:),(:-:),(:*:),(:/:),Neg),
+    Expr(Var,Val,Function,(:+:),(:-:),(:*:),(:/:),(:==:),Neg),
     Stmt((:=),(:->)),
     execProg,
     writeWorldToSVG
@@ -35,9 +35,10 @@ data Order = TL Expr  -- Turn Left angle
             | Repeat Expr [Order] -- Repeat a series of simple order (see above)
             | Declare [Stmt]
             | Build Canvas
+            | IF Expr ([Order],[Order])
 
 -- The turtle abstract data type
-data Turtle = Turtle Coordinate Cap Bool deriving Show
+data Turtle = Turtle Coordinate Cap Bool
 
 -- The world abstract data type
 data World = World Turtle Image Storage
@@ -51,6 +52,7 @@ data Expr = Var Var
           | Expr :-: Expr
           | Expr :*: Expr
           | Expr :/: Expr
+          | Expr :==: Expr
           | Neg Expr
 
 instance Eq Expr where
@@ -66,6 +68,9 @@ data Stmt = Var := Expr -- Declare and store variables in the memory
 getFunction :: Var -> Engine -> Function
 getFunction var engine = fromMaybe (error ("Variable not affected to a function ")) (lookup var engine)
 
+boolToInt :: Bool -> Int
+boolToInt b = if (b) then 1 else 0
+
 -- Function to evaluate an expression
 eval :: Expr -> Storage -> Val
 eval (Val v) _ = v
@@ -76,6 +81,7 @@ eval (e1 :-: e2) store = eval e1 store - eval e2 store
 eval (e1 :*: e2) store = eval e1 store * eval e2 store
 eval (e1 :/: e2) store = eval e1 store `div` eval e2 store
 eval (Neg e1) store = -(eval e1 store)
+eval (e1 :==: e2) store = boolToInt ((eval e1 store) == (eval e2 store))
 
 -- Function to execute a single statement (The storage is updated)
 execStmt :: Stmt -> Storage -> Storage
@@ -132,6 +138,7 @@ execOrder (Repeat count orders) (World turtle image storage) | valCount > 0 = ex
 
 -- Add the possibility to declare functions and variables
 execOrder (Declare stmts) (World turtle image storage) = World turtle image (execStmts stmts storage)
+execOrder (IF expr (ordersT,ordersF)) (World turtle image storage) = if (eval expr storage) == 1 then execOrders (World turtle image storage) ordersT else execOrders (World turtle image storage) ordersF
 
 
 -- Function to execute a list of orders by the turtle in the world
