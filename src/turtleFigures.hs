@@ -32,7 +32,7 @@ drawRegularPolygon = execProg [
                                 ]
                               ]
 
--- Function to draw a square
+-- Function to draw a mill
 drawMill :: World
 drawMill = execProg [
                       Build (800,800),
@@ -59,7 +59,7 @@ drawMill = execProg [
                     ]
                     where halfLength = Function "halfReduce" (Var "wingLength")
 
------------------------------ The Koch SnowFlake ------------------------------------
+----------------------------- The Koch SnowFlake and some variants ------------------------------------
 fractaleKoch :: Expr -> Order
 fractaleKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
                      where  recur = fractaleKoch (count :-: Val 1) -- Decrease currentN
@@ -108,13 +108,13 @@ invertedKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
                                       recur,
                                       TL (Val 120),
                                       recur,
-                                      TR (Val 240),
+                                      TL (Val 120),
                                       recur,
                                       TL (Val 120),
                                       recur
                                     ]
 
--- Function to draw the snowflake based on the fractale function above
+-- Function to draw the snowflake based on the fractaleKoch function above
 drawSnowFlake :: World
 drawSnowFlake = execProg  [
                             Build (1200,1200),
@@ -143,7 +143,7 @@ drawQuadraSnowFlake = execProg  [
                             [
                               "constN" := Val 4, -- The n generation desired
                               "baseLength" := Val 400, -- The total fractale length
-                              -- For calculation, mustn't be edited
+                              -- For calculation, shouldn't be edited
                               "3powerN" :-> (\x -> 3^x),
                               "currentN" := Var "constN", -- The current value of n (initialized to constN value)
                               "fractLength" := (Var "baseLength" :/: (Function "3powerN" (Var "constN"))) -- The length of every fractale fragment
@@ -180,11 +180,11 @@ drawPointedSnowFlake = execProg  [
 
 drawInvertedSnowFlake :: World
 drawInvertedSnowFlake = execProg  [
-                                    Build (1500,1500),
+                                    Build (1200,1200),
                                     Declare
                                     [
                                       "constN" := Val 4, -- The n generation desired
-                                      "baseLength" := Val 2000, -- The total fractale length
+                                      "baseLength" := Val 1600, -- The total fractale length
                                       -- For calculation, mustn't be edited
                                       "3powerN" :-> (\x -> 3^x),
                                       "currentN" := Var "constN", -- The current value of n (initialized to constN value)
@@ -194,7 +194,7 @@ drawInvertedSnowFlake = execProg  [
                                     Repeat (Val 4)
                                     [
                                       invertedKoch (Var "currentN"),
-                                      TR (Val 240),
+                                      TL (Val 120),
                                       Declare ["currentN" := Var "constN"] -- Reset the current n value
                                     ]
                                   ]
@@ -208,9 +208,11 @@ drawQuadSpiral = execProg [
                         Declare
                         [
                           "length" := Val 500,
-                          "depth" := Val 300, -- Depth of the spiral (number of nested squares)
+                          "depth" := Val 100, -- Depth of the spiral (number of nested squares)
                           "reduceSquare" :-> (\x -> x - x `div` 20) -- Square length reduced of 5% every nested dquare
                         ],
+                        Ink (80,0,80),
+                        Stroke 4,
                         TL (Val 90),
                         Repeat (Var "depth")
                         [
@@ -235,6 +237,8 @@ drawCircSpiral = execProg [
                               "increase" := Val 1,
                               "depth" := Val 200
                             ],
+                            Ink (255,100,100),
+                            Stroke 20,
                             Repeat (Var "depth")
                             [
                               TL (Val 30),
@@ -245,6 +249,8 @@ drawCircSpiral = execProg [
                               ]
                             ]
                           ]
+
+-------------------- FUNCTIONS to draw the triangle of Sierpinski --------------------------------------------
 
 sierpinski :: Expr -> Expr -> Order
 sierpinski n long = IF (n :==: Val 0) (iftrue,ifnot)
@@ -271,8 +277,12 @@ drawSierpinski = execProg [
                               "n" := Val 4,
                               "length" := Val 600
                             ],
+                            Ink (100,0,255),
+                            Stroke 10,
                             sierpinski (Var "n") (Var "length")
                           ]
+
+-------------------------------------------------------------------------------------------------------
 
 main = do
     writeWorldToSVG drawSquare "..\\svg\\square.svg"

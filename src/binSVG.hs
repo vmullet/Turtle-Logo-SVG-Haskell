@@ -19,11 +19,11 @@ type Coordinate = (Int,Int)
 type Color = (Int,Int,Int)
 
 -- The different possible shapes
-data Shape = Rectangle Coordinate Int Int Color
-            | Circle Coordinate Int Color
-            | Line Coordinate Coordinate Color
-            | PolyLine [Coordinate] Color
-            | Polygon [Coordinate] Color 
+data Shape = Rectangle Coordinate Int Int Color Int
+            | Circle Coordinate Int Color Int
+            | Line Coordinate Coordinate Color Int
+            | PolyLine [Coordinate] Color Int
+            | Polygon [Coordinate] Color Int
             deriving Show
 
 -- Image is an array of Shape
@@ -49,11 +49,11 @@ coordArrayToString [] = ""
 coordArrayToString ((hx,hy):t) = show hx ++ " " ++ show hy ++ " " ++ coordArrayToString t
 
 shapeToString :: Shape -> String
-shapeToString (Rectangle (x,y) width height color) = "<rect x='" ++ show x ++ "' y='" ++ show y ++ "' width='" ++ show width ++ "' height='" ++ show height ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='5'/>\n"
-shapeToString (Circle (x,y) radius color) = "<circle cx='" ++ show x ++ "' cy='" ++ show y ++ "' r='" ++ show radius ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='5'/>\n"
-shapeToString (Line (x1,y1) (x2,y2) color) = "<line x1='" ++ show x1 ++ "' x2='" ++ show x2 ++ "' y1='" ++ show y1 ++ "' y2='" ++ show y2 ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='5'/>\n"
-shapeToString (PolyLine positions color) = "<polyline points='" ++ coordArrayToString positions ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='5'/>\n"
-shapeToString (Polygon positions color) = "<polygon points='" ++ coordArrayToString positions ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='5'/>\n"
+shapeToString (Rectangle (x,y) width height color strokeW) = "<rect x='" ++ show x ++ "' y='" ++ show y ++ "' width='" ++ show width ++ "' height='" ++ show height ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='" ++ show strokeW ++ "'/>\n"
+shapeToString (Circle (x,y) radius color strokeW) = "<circle cx='" ++ show x ++ "' cy='" ++ show y ++ "' r='" ++ show radius ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='" ++ show strokeW ++ "'/>\n"
+shapeToString (Line (x1,y1) (x2,y2) color strokeW) = "<line x1='" ++ show x1 ++ "' x2='" ++ show x2 ++ "' y1='" ++ show y1 ++ "' y2='" ++ show y2 ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='" ++ show strokeW ++ "'/>\n"
+shapeToString (PolyLine positions color strokeW) = "<polyline points='" ++ coordArrayToString positions ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='" ++ show strokeW ++ "'/>\n"
+shapeToString (Polygon positions color strokeW) = "<polygon points='" ++ coordArrayToString positions ++ "' stroke='" ++ colorToString color ++ "' fill='transparent' stroke-width='" ++ show strokeW ++ "'/>\n"
 
 shapeArrayToString :: [Shape] -> String
 shapeArrayToString = foldr ((++) . shapeToString) ""

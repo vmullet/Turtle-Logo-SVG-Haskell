@@ -31,5 +31,5 @@ drawRandomSquares canvas shapes quantity = do
         writeImageToSVG (Image canvas shapes) "randomSquares.svg"
 
 
---main = do
---  drawRandomSquare (1000,1000) [] 10
+main = do
+  drawRandomSquare (1000,1000) [] 10
