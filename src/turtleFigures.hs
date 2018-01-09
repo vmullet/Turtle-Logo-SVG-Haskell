@@ -201,7 +201,7 @@ drawInvertedSnowFlake = execProg  [
 
 ---------------------------------------------------------------------------------------------
 
--- Function to draw a spiral
+-- Functions to draw spirals (Quadratic or Circular)
 drawQuadSpiral :: World
 drawQuadSpiral = execProg [
                         Build (1200,1200),
