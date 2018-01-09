@@ -5,7 +5,7 @@ module BinTurtle(
     Var,
     Order(TL,TR,MF,MB,LP,Ink,Clear,Repeat,Declare,Build,IF),
     World(World),
-    Expr(Var,Val,Function,(:+:),(:-:),(:*:),(:/:),(:==:),(:!=:),Neg),
+    Expr(Var,Val,Function,(:+:),(:-:),(:*:),(:/:),(:==:),(:!=:),(:>:),(:<:),(:>=:),(:<=:),Neg),
     Stmt((:=),(:->)),
     execProg,
     writeWorldToSVG
@@ -57,6 +57,10 @@ data Expr = Var Var
           | Expr :/: Expr
           | Expr :==: Expr -- Equality
           | Expr :!=: Expr -- Different
+          | Expr :>: Expr
+          | Expr :<: Expr
+          | Expr :>=: Expr
+          | Expr :<=: Expr
           | Neg Expr -- Negative (is like *(-1))
 
 -- Possible instructions
@@ -81,6 +85,10 @@ eval (e1 :*: e2) store = eval e1 store * eval e2 store
 eval (e1 :/: e2) store = eval e1 store `div` eval e2 store
 eval (e1 :==: e2) store = boolToInt ((eval e1 store) == (eval e2 store))
 eval (e1 :!=: e2) store = boolToInt (not ((eval e1 store) == (eval e2 store)))
+eval (e1 :>: e2) store = boolToInt ((eval e1 store) > (eval e2 store))
+eval (e1 :<: e2) store = boolToInt ((eval e1 store) < (eval e2 store))
+eval (e1 :>=: e2) store = boolToInt ((eval e1 store) >= (eval e2 store))
+eval (e1 :<=: e2) store = boolToInt ((eval e1 store) <= (eval e2 store))
 eval (Neg e1) store = -(eval e1 store)
 
 
@@ -129,15 +137,15 @@ execOrder :: Order -> World -> World
 execOrder (Build canvas) _ = buildWorld canvas -- Order to build the world
 execOrder (TL angle) (World (Turtle (tx,ty) cap pen) image store) = World (Turtle (tx,ty) ((cap - eval angle store) `mod` 360) pen) image store
 execOrder (TR angle) world = execOrder (TL (Neg angle)) world -- Turn Right = Opposite of Turn Left
-execOrder (MF pixels) (World (Turtle (tx,ty) cap (statePen,color)) image store) | statePen = World (Turtle (endX,endY) cap pen) (addShapeToImage (Line (tx,ty) (endX,endY) color) image) store
+execOrder (MF pixels) (World (Turtle (tx,ty) cap (lowerPen,color)) image store) | lowerPen = World (Turtle (endX,endY) cap pen) (addShapeToImage (Line (tx,ty) (endX,endY) color) image) store
                                                                                 | otherwise = World (Turtle (endX,endY) cap pen) image store
                                                                                   where endX = tx + round (cos (toRadian cap) * fromIntegral (eval pixels store))
                                                                                         endY = ty + round (sin (toRadian cap) * fromIntegral (eval pixels store))
-                                                                                        pen = (statePen,color)
+                                                                                        pen = (lowerPen,color)
 
 execOrder (MB pixels) world = execOrder (MF (Neg pixels)) world -- Move Backward = Opposite of Move Forward
-execOrder (LP statePen) (World (Turtle (tx,ty) cap (_,penColor)) image store) = World (Turtle (tx,ty) cap (statePen,penColor)) image store
-execOrder (Ink color) (World (Turtle (tx,ty) cap (statePen,_)) image store) = World (Turtle (tx,ty) cap (statePen,color)) image store
+execOrder (LP lowerPen) (World (Turtle (tx,ty) cap (_,penColor)) image store) = World (Turtle (tx,ty) cap (lowerPen,penColor)) image store
+execOrder (Ink color) (World (Turtle (tx,ty) cap (lowerPen,_)) image store) = World (Turtle (tx,ty) cap (lowerPen,color)) image store
 execOrder Clear (World _ (Image canvas _) _) = buildWorld canvas -- Reset screen and turtle
 
 -- Add the possibility to repeat a list of orders

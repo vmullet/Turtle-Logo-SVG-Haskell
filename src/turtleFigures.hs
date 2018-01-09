@@ -202,8 +202,8 @@ drawInvertedSnowFlake = execProg  [
 ---------------------------------------------------------------------------------------------
 
 -- Function to draw a spiral
-drawSpiral :: World
-drawSpiral = execProg [
+drawQuadSpiral :: World
+drawQuadSpiral = execProg [
                         Build (1200,1200),
                         Declare
                         [
@@ -225,6 +225,26 @@ drawSpiral = execProg [
                           ]
                         ]
                       ]
+
+drawCircSpiral :: World
+drawCircSpiral = execProg [
+                            Build (1200,1200),
+                            Declare
+                            [
+                              "space" := Val 1,
+                              "increase" := Val 1,
+                              "depth" := Val 200
+                            ],
+                            Repeat (Var "depth")
+                            [
+                              TL (Val 30),
+                              MF (Var "space"),
+                              Declare
+                              [
+                                "space" := ((Var "space") :+: Var "increase")
+                              ]
+                            ]
+                          ]
 
 sierpinski :: Expr -> Expr -> Order
 sierpinski n long = IF (n :==: Val 0) (iftrue,ifnot)
@@ -255,12 +275,13 @@ drawSierpinski = execProg [
                           ]
 
 main = do
-    writeWorldToSVG drawSquare "C:\\Etc\\square.svg"
-    writeWorldToSVG drawRegularPolygon "C:\\Etc\\polygReg.svg"
-    writeWorldToSVG drawMill "C:\\Etc\\mill.svg"
-    writeWorldToSVG drawSpiral "C:\\Etc\\spiral.svg"
-    writeWorldToSVG drawSnowFlake "C:\\Etc\\snowFlake.svg"
-    writeWorldToSVG drawQuadraSnowFlake "C:\\Etc\\quadraSnowFlake.svg"
-    writeWorldToSVG drawPointedSnowFlake "C:\\Etc\\pointedSnowFlake.svg"
-    writeWorldToSVG drawInvertedSnowFlake "C:\\Etc\\invertedSnowFlake.svg"
-    writeWorldToSVG drawSierpinski "C:\\Etc\\triangleSierpinski.svg"
+    writeWorldToSVG drawSquare "..\\svg\\square.svg"
+    writeWorldToSVG drawRegularPolygon "..\\svg\\polygReg.svg"
+    writeWorldToSVG drawMill "..\\svg\\mill.svg"
+    writeWorldToSVG drawQuadSpiral "..\\svg\\quadSpiral.svg"
+    writeWorldToSVG drawCircSpiral "..\\svg\\circSpiral.svg"
+    writeWorldToSVG drawSnowFlake "..\\svg\\snowFlake.svg"
+    writeWorldToSVG drawQuadraSnowFlake "..\\svg\\quadraSnowFlake.svg"
+    writeWorldToSVG drawPointedSnowFlake "..\\svg\\pointedSnowFlake.svg"
+    writeWorldToSVG drawInvertedSnowFlake "..\\svg\\invertedSnowFlake.svg"
+    writeWorldToSVG drawSierpinski "..\\svg\\triangleSierpinski.svg"
