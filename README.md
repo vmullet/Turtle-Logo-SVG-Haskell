@@ -35,6 +35,8 @@ The **Turtle Language** is based on a global data type called **World** where th
 
 This is a global schema to resume the data structure of the language.
 
+![](https://i.imgur.com/rvlm0D0.jpg)
+
 ```mermaid
 graph TD
 A[World] --> B(Turtle)
