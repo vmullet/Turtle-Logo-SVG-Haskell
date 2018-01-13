@@ -147,10 +147,10 @@ execOrder (Build canvas) _ = buildWorld canvas -- Order to build the world
 execOrder (TL angle) (World (Turtle (tx,ty) cap pen) screen store) = World (Turtle (tx,ty) ((cap - eval angle store) `mod` 360) pen) screen store
 execOrder (TR angle) world = execOrder (TL (Neg angle)) world -- Turn Right = Opposite of Turn Left
 execOrder (MF pixels) (World (Turtle (tx,ty) cap (lowerPen,color,stroke)) screen store) | lowerPen = World (Turtle (endX,endY) cap pen) (addShapeToScreen (Line (tx,ty) (endX,endY) color stroke) screen) store
-                                                                                | otherwise = World (Turtle (endX,endY) cap pen) screen store
-                                                                                  where endX = tx + round (cos (toRadian cap) * fromIntegral (eval pixels store))
-                                                                                        endY = ty + round (sin (toRadian cap) * fromIntegral (eval pixels store))
-                                                                                        pen = (lowerPen,color,stroke)
+                                                                                        | otherwise = World (Turtle (endX,endY) cap pen) screen store
+                                                                                        where endX = tx + round (cos (toRadian cap) * fromIntegral (eval pixels store))
+                                                                                              endY = ty + round (sin (toRadian cap) * fromIntegral (eval pixels store))
+                                                                                              pen = (lowerPen,color,stroke)
 
 execOrder (MB pixels) world = execOrder (MF (Neg pixels)) world -- Move Backward = Opposite of Move Forward
 execOrder (LP lowerPen) (World (Turtle (tx,ty) cap (_,penColor,stroke)) screen store) = World (Turtle (tx,ty) cap (lowerPen,penColor,stroke)) screen store
@@ -160,13 +160,14 @@ execOrder Clear (World _ (Screen canvas _) _) = buildWorld canvas -- Reset scree
 
 -- Add the possibility to repeat a list of orders
 execOrder (Repeat count orders) (World turtle screen storage) | valCount > 0 = execOrder (Repeat (Val (valCount-1)) orders) (execOrders world orders)
-                                                             | otherwise = world
-                                                             where world = World turtle screen storage
-                                                                   valCount = eval count storage 
+                                                              | otherwise = world
+                                                              where world = World turtle screen storage
+                                                                    valCount = eval count storage 
 
 -- Add the possibility to declare functions and variables
 execOrder (Declare stmts) (World turtle screen storage) = World turtle screen (execStmts stmts storage)
-execOrder (IF expr (ordersT,ordersF)) (World turtle screen storage) = if eval expr storage == 1 then execOrders (World turtle screen storage) ordersT else execOrders (World turtle screen storage) ordersF
+execOrder (IF expr (ordersT,ordersF)) (World turtle screen storage) = if eval expr storage == 1 then execOrders (World turtle screen storage) ordersT 
+                                                                                                else execOrders (World turtle screen storage) ordersF
 
 
 -- Function to execute a list of orders by the turtle in the world
