@@ -91,7 +91,7 @@ D --> E
 
 # How to use it
 
-Create a haskell file (.hs) and import BinTurtle
+Create a haskell file (.hs) and import BinTurtle **(You must have binTurtle.hs and binSVG.hs in the same folder)**
 
 Create a function which returns a World and call "execProg" function. 
 
