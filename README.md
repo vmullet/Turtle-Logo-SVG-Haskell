@@ -115,3 +115,9 @@ This is an example to draw a square :
 							  TL (Val 90)
 						 ]
 					     ]
+
+
+Then, to export as a SVG file, you have to call this function like this :
+
+    main = do
+    writeWorldToSVG drawSquare "..\\svg\\square.svg"
