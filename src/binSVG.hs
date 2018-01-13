@@ -3,9 +3,9 @@ module BinSVG(
     Coordinate,
     Color,
     Shape(Rectangle,Circle,Line,PolyLine),
-    Image(Image),
-    addShapeToImage,
-    writeImageToSVG
+    Screen(Screen),
+    addShapeToScreen,
+    writeScreenToSVG
 )
 where
 
@@ -27,7 +27,7 @@ data Shape = Rectangle Coordinate Int Int Color Int
             deriving Show
 
 -- Image is an array of Shape
-data Image = Image Canvas [Shape] deriving Show
+data Screen = Screen Canvas [Shape] deriving Show
 
 -- Function for static parts of a SVG file
 headerSVG :: String
@@ -58,10 +58,10 @@ shapeToString (Polygon positions color strokeW) = "<polygon points='" ++ coordAr
 shapeArrayToString :: [Shape] -> String
 shapeArrayToString = foldr ((++) . shapeToString) ""
 
-addShapeToImage :: Shape -> Image -> Image
-addShapeToImage shape (Image canvas shapes) = Image canvas (shape : shapes)
+addShapeToScreen :: Shape -> Screen -> Screen
+addShapeToScreen shape (Screen canvas shapes) = Screen canvas (shape : shapes)
 
 
 -- Function to write an Image type data to a SVG file
-writeImageToSVG :: Image -> String -> IO ()
-writeImageToSVG (Image canvas shapes) path = writeFile path (headerSVG ++ canvasToString canvas ++ shapeArrayToString shapes ++ footerSVG)
+writeScreenToSVG :: Screen -> String -> IO ()
+writeScreenToSVG (Screen canvas shapes) path = writeFile path (headerSVG ++ canvasToString canvas ++ shapeArrayToString shapes ++ footerSVG)

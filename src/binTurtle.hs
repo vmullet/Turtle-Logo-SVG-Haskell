@@ -46,7 +46,7 @@ data Order = TL Expr  -- Turn Left angle
 data Turtle = Turtle Coordinate Cap Pen deriving Show
 
 -- The world abstract data type
-data World = World Turtle Image Storage
+data World = World Turtle Screen Storage
 
 ----- IMPLEMENTATION OF THE VARIABLE SYSTEM -----
 
@@ -133,40 +133,40 @@ defaultPen = (True,(0,0,0),5)
 
 -- Function to create the world and set the turtle in the middle with the pen lowered (used for Build and Clear Orders)
 buildWorld :: Canvas -> World
-buildWorld (width,height) = World(Turtle(tPos,tPos) 0 defaultPen) (Image (width,height) []) ([],[])
+buildWorld (width,height) = World(Turtle(tPos,tPos) 0 defaultPen) (Screen (width,height) []) ([],[])
                             where tPos = width `div` 2
 
 -- Function to create an emptyWorld (no canvas,no turtle in the middle...) (base parameter for the execOrders function)
 emptyWorld :: World
-emptyWorld = World(Turtle(0,0) 0 defaultPen) (Image (0,0) []) ([],[])
+emptyWorld = World(Turtle(0,0) 0 defaultPen) (Screen (0,0) []) ([],[])
 
 
 -- Function to execute an order by the turtle in the world
 execOrder :: Order -> World -> World
 execOrder (Build canvas) _ = buildWorld canvas -- Order to build the world
-execOrder (TL angle) (World (Turtle (tx,ty) cap pen) image store) = World (Turtle (tx,ty) ((cap - eval angle store) `mod` 360) pen) image store
+execOrder (TL angle) (World (Turtle (tx,ty) cap pen) screen store) = World (Turtle (tx,ty) ((cap - eval angle store) `mod` 360) pen) screen store
 execOrder (TR angle) world = execOrder (TL (Neg angle)) world -- Turn Right = Opposite of Turn Left
-execOrder (MF pixels) (World (Turtle (tx,ty) cap (lowerPen,color,stroke)) image store) | lowerPen = World (Turtle (endX,endY) cap pen) (addShapeToImage (Line (tx,ty) (endX,endY) color stroke) image) store
-                                                                                | otherwise = World (Turtle (endX,endY) cap pen) image store
+execOrder (MF pixels) (World (Turtle (tx,ty) cap (lowerPen,color,stroke)) screen store) | lowerPen = World (Turtle (endX,endY) cap pen) (addShapeToScreen (Line (tx,ty) (endX,endY) color stroke) screen) store
+                                                                                | otherwise = World (Turtle (endX,endY) cap pen) screen store
                                                                                   where endX = tx + round (cos (toRadian cap) * fromIntegral (eval pixels store))
                                                                                         endY = ty + round (sin (toRadian cap) * fromIntegral (eval pixels store))
                                                                                         pen = (lowerPen,color,stroke)
 
 execOrder (MB pixels) world = execOrder (MF (Neg pixels)) world -- Move Backward = Opposite of Move Forward
-execOrder (LP lowerPen) (World (Turtle (tx,ty) cap (_,penColor,stroke)) image store) = World (Turtle (tx,ty) cap (lowerPen,penColor,stroke)) image store
-execOrder (Ink color) (World (Turtle (tx,ty) cap (lowerPen,_,stroke)) image store) = World (Turtle (tx,ty) cap (lowerPen,color,stroke)) image store
-execOrder (Stroke stroke) (World (Turtle (tx,ty) cap (lowerPen,color,_)) image store) = World (Turtle (tx,ty) cap (lowerPen,color,stroke)) image store
-execOrder Clear (World _ (Image canvas _) _) = buildWorld canvas -- Reset screen and turtle
+execOrder (LP lowerPen) (World (Turtle (tx,ty) cap (_,penColor,stroke)) screen store) = World (Turtle (tx,ty) cap (lowerPen,penColor,stroke)) screen store
+execOrder (Ink color) (World (Turtle (tx,ty) cap (lowerPen,_,stroke)) screen store) = World (Turtle (tx,ty) cap (lowerPen,color,stroke)) screen store
+execOrder (Stroke stroke) (World (Turtle (tx,ty) cap (lowerPen,color,_)) screen store) = World (Turtle (tx,ty) cap (lowerPen,color,stroke)) screen store
+execOrder Clear (World _ (Screen canvas _) _) = buildWorld canvas -- Reset screen and turtle
 
 -- Add the possibility to repeat a list of orders
-execOrder (Repeat count orders) (World turtle image storage) | valCount > 0 = execOrder (Repeat (Val (valCount-1)) orders) (execOrders world orders)
+execOrder (Repeat count orders) (World turtle screen storage) | valCount > 0 = execOrder (Repeat (Val (valCount-1)) orders) (execOrders world orders)
                                                              | otherwise = world
-                                                             where world = World turtle image storage
+                                                             where world = World turtle screen storage
                                                                    valCount = eval count storage 
 
 -- Add the possibility to declare functions and variables
-execOrder (Declare stmts) (World turtle image storage) = World turtle image (execStmts stmts storage)
-execOrder (IF expr (ordersT,ordersF)) (World turtle image storage) = if eval expr storage == 1 then execOrders (World turtle image storage) ordersT else execOrders (World turtle image storage) ordersF
+execOrder (Declare stmts) (World turtle screen storage) = World turtle screen (execStmts stmts storage)
+execOrder (IF expr (ordersT,ordersF)) (World turtle screen storage) = if eval expr storage == 1 then execOrders (World turtle screen storage) ordersT else execOrders (World turtle screen storage) ordersF
 
 
 -- Function to execute a list of orders by the turtle in the world
@@ -181,7 +181,7 @@ execProg orders = execOrders emptyWorld orders
 
 -- Function to export the world into a SVG file
 writeWorldToSVG :: World -> String -> IO ()
-writeWorldToSVG (World _ image _) = writeImageToSVG image -- Check binSvg for the writeImageToSVG function
+writeWorldToSVG (World _ screen _) = writeScreenToSVG screen -- Check binSvg for the writeScreenToSVG function
 
 
 
