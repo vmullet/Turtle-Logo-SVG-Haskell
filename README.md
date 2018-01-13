@@ -88,3 +88,30 @@ B --> E
 C --> E
 D --> E
 ```
+
+# How to use it
+
+Create a haskell file (.hs) and import BinTurtle
+
+Create a function which returns a World and call "execProg" function. 
+
+*(This function takes a list of orders as parameters)*
+
+This is an example to draw a square :
+
+**N.B : The "Build" order must be given first.**
+
+    import BinTurtle
+    drawSquare :: World
+    drawSquare = execProg[
+						 Build (1000,1000) -- Must be called first
+						 Declare
+						 [
+							  Var "length" := Val 50
+						 ]
+						 Repeat (Val 4)
+						 [
+							  MF (Var "length")
+							  TL (Val 90)
+						 ]
+					     ]
