@@ -27,7 +27,7 @@ type Memory = [(Var,Val)] -- Mapping between Variable and their values
 type Engine = [(Var,Function)] -- Mapping between Functions and their definitions
 type Storage = (Memory,Engine) -- Representation of the storage system of the World
 
--- An order given to the turtle
+-- Orders which can be given to the turtle
 data Order = TL Expr  -- Turn Left angle
             | TR Expr -- Turn Right angle
             | MF Expr -- Move Forward pixels
@@ -36,10 +36,10 @@ data Order = TL Expr  -- Turn Left angle
             | Ink Color -- Change Pen Ink color
             | Stroke Int -- Change the stroke width of the pen
             | Clear -- Clear screen and center turtle
-            | Repeat Expr [Order] -- Repeat a series of orders for a specific number of time under the form of an expression
+            | Repeat Expr [Order] -- Repeat a series of orders for a specific number of times under the form of an expression
             | Declare [Stmt] -- Declare variables,functions,update their values...
-            | Build Canvas
-            | IF Expr ([Order],[Order])
+            | Build Canvas -- Build the screen and init turtle position
+            | IF Expr ([Order],[Order]) -- IF Condition ([OrdersIfTrue],[OrdersIfFalse])
             deriving Show
 
 -- The turtle abstract data type
@@ -70,11 +70,12 @@ data Expr = Var Var
 data Stmt = Var := Expr -- Declare and store variables in the memory
           | Var :-> Function -- Declare and store functions in the engine
 
+-- Defined because you can't show a function definition, only a function result
 instance Show Stmt where
   show (x :-> _) = x ++ " -> Function"
   show (x := expr) = show x ++ " := " ++ show expr
 
-
+-- Function to convert bool into int (The language only supports Int)
 boolToInt :: Bool -> Int
 boolToInt b = if b then 1 else 0
 
@@ -86,7 +87,7 @@ getFunction var engine = fromMaybe (error "Variable not affected to a function "
 eval :: Expr -> Storage -> Val
 eval (Val v) _ = v
 eval (Var x) (memory,_) = fromMaybe (error "Variable not affected to a value ") (lookup x memory)
-eval (Function name param) (m,e) = getFunction name e (eval param (m, e))
+eval (Function name param) (m,e) = getFunction name e (eval param (m, e)) -- Get function and apply it to parameter
 eval (e1 :+: e2) store = eval e1 store + eval e2 store
 eval (e1 :-: e2) store = eval e1 store - eval e2 store
 eval (e1 :*: e2) store = eval e1 store * eval e2 store
@@ -102,9 +103,11 @@ eval (Neg e1) store = -(eval e1 store)
 
 -- Function to execute a single statement (The storage is updated)
 execStmt :: Stmt -> Storage -> Storage
-execStmt (x := expr) (m,e) = if existMemVar x m then (updateMemVar x newValue m, e) else ((x, newValue) : m, e) -- The variable is added or updated
+execStmt (x := expr) (m,e) = if existMemVar x m then (updateMemVar x newValue m, e)
+                                                else ((x, newValue) : m, e) -- The variable is added or updated
                              where newValue = eval expr (m, e)
-execStmt (x :-> funct) (m,e) = (m,(x,funct) : e)  -- The function is added to the engine
+execStmt (x :-> funct) (m,e) = if existEngFunc x e then (m, updateEngFunc x funct e)
+                                                   else(m,(x,funct) : e)  -- The function is added or updated in the engine
 
 
 -- Function to execute an array of statements
@@ -118,11 +121,24 @@ existMemVar _ [] = False
 existMemVar var ((name,_):t)  | var == name = True
                               | otherwise = existMemVar var t
 
+
 -- Function to update the variable value in the memory
 updateMemVar :: Var -> Val -> Memory -> Memory
 updateMemVar _ _ [] = []
 updateMemVar var newVal ((name,val):t) = if var == name then (name, newVal) : t 
                                                         else (name, val) : updateMemVar var newVal t
+
+-- Function to check if the function already exists in the engine
+existEngFunc :: Var -> Engine -> Bool
+existEngFunc _ [] = False
+existEngFunc var ((name,_):t)  | var == name = True
+                               | otherwise = existEngFunc var t
+
+-- Function to update the function definition in the engine
+updateEngFunc :: Var -> Function -> Engine -> Engine
+updateEngFunc _ _ [] = []
+updateEngFunc var newFunc ((name,func):t) = if var == name then (name, newFunc) : t 
+                                                           else (name, func) : updateEngFunc var newFunc t
 
 -- Function to convert degrees to radians
 toRadian :: Int -> Float
@@ -160,7 +176,8 @@ execOrder (Stroke stroke) (World (Turtle (tx,ty) cap (lowerPen,color,_)) screen 
 execOrder Clear (World _ (Screen canvas _) _) = buildWorld canvas -- Reset screen and turtle
 
 -- Add the possibility to repeat a list of orders
-execOrder (Repeat count orders) (World turtle screen storage) | valCount > 0 = execOrder (Repeat (Val (valCount-1)) orders) (execOrders world orders)
+execOrder (Repeat count orders) (World turtle screen storage) | valCount < 0 = error "The repeat count must be positive"
+                                                              | valCount > 0 = execOrder (Repeat (Val (valCount-1)) orders) (execOrders world orders)
                                                               | otherwise = world
                                                               where world = World turtle screen storage
                                                                     valCount = eval count storage 
@@ -176,7 +193,7 @@ execOrders :: World -> [Order] -> World
 execOrders = foldl (flip execOrder)
 
 -- The main function to execute a list of orders 
--- N.B : The baseWorld is an emptyWorld as everything will be initialized by a "Build" order)
+-- N.B : The baseWorld is an emptyWorld as everything will be initialized by a "Build" order inside the array of Orders)
 execProg :: [Order] -> World
 execProg [] = emptyWorld
 execProg orders = execOrders emptyWorld orders
