@@ -106,6 +106,7 @@ execStmt :: Stmt -> Storage -> Storage
 execStmt (x := expr) (m,e) = if existMemVar x m then (updateMemVar x newValue m, e)
                                                 else ((x, newValue) : m, e) -- The variable is added or updated
                              where newValue = eval expr (m, e)
+
 execStmt (x :-> funct) (m,e) = if existEngFunc x e then (m, updateEngFunc x funct e)
                                                    else(m,(x,funct) : e)  -- The function is added or updated in the engine
 
@@ -160,7 +161,7 @@ emptyWorld = World(Turtle(0,0) 0 defaultPen) (Screen (0,0) []) ([],[])
 
 -- Function to execute an order by the turtle in the world
 execOrder :: Order -> World -> World
-execOrder (Build canvas) _ = buildWorld canvas -- Order to build the world
+execOrder (Build canvas) _ = buildWorld canvas -- Order to build the world and init turtle position
 execOrder (TL angle) (World (Turtle (tx,ty) cap pen) screen store) = World (Turtle (tx,ty) ((cap - eval angle store) `mod` 360) pen) screen store
 execOrder (TR angle) world = execOrder (TL (Neg angle)) world -- Turn Right = Opposite of Turn Left
 execOrder (MF pixels) (World (Turtle (tx,ty) cap (lowerPen,color,stroke)) screen store) | lowerPen = World (Turtle (endX,endY) cap pen) (addShapeToScreen (Line (tx,ty) (endX,endY) color stroke) screen) store
@@ -182,9 +183,11 @@ execOrder (Repeat count orders) (World turtle screen storage) | valCount < 0 = e
                                                               where world = World turtle screen storage
                                                                     valCount = eval count storage 
 
--- Add the possibility to declare functions and variables
+-- Add the possibility to declare/update functions and variables
 execOrder (Declare stmts) (World turtle screen storage) = World turtle screen (execStmts stmts storage)
-execOrder (IF expr (ordersT,ordersF)) (World turtle screen storage) = if eval expr storage == 1 then execOrders (World turtle screen storage) ordersT 
+
+-- Add the possibility to give IF condition
+execOrder (IF expr (ordersT,ordersF)) (World turtle screen storage) = if eval expr storage == 1 then execOrders (World turtle screen storage) ordersT
                                                                                                 else execOrders (World turtle screen storage) ordersF
 
 
@@ -193,7 +196,7 @@ execOrders :: World -> [Order] -> World
 execOrders = foldl (flip execOrder)
 
 -- The main function to execute a list of orders 
--- N.B : The baseWorld is an emptyWorld as everything will be initialized by a "Build" order inside the array of Orders)
+-- The first order must be a "Build" order inside the array of Orders)
 execProg :: [Order] -> World
 execProg [] = emptyWorld
 execProg orders = execOrders emptyWorld orders
