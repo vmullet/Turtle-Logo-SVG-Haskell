@@ -121,7 +121,8 @@ existMemVar var ((name,_):t)  | var == name = True
 -- Function to update the variable value in the memory
 updateMemVar :: Var -> Val -> Memory -> Memory
 updateMemVar _ _ [] = []
-updateMemVar var newVal ((name,val):t) = if var == name then (name, newVal) : t else (name, val) : updateMemVar var newVal t
+updateMemVar var newVal ((name,val):t) = if var == name then (name, newVal) : t 
+                                                        else (name, val) : updateMemVar var newVal t
 
 -- Function to convert degrees to radians
 toRadian :: Int -> Float
