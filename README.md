@@ -1,8 +1,8 @@
 # Turtle Logo Haskell-SVG
 
 This project consists in creating an abstract language to reproduce the **Turtle Logo** in **Haskell** by using the **SVG** format as a graphical interface.
+
 With the features of functional programming, it will be possible to draw complex figures easily such as **fractales (Koch Snowflake,etc...)** by giving orders to the turtle.
-This abstract language will be called : **The Turtle Language**
 
 
 ## Project Structure
