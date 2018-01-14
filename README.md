@@ -76,7 +76,7 @@ The turtle can receive the following orders :
 The language supports the notion of variables/ functions/ values described as expressions (**Expr**)
 You can combine any expressions by using operators like on the following schema :
 
-[Imgur](https://i.imgur.com/8E8WVLk.jpg)
+![](https://i.imgur.com/8E8WVLk.jpg)
 
 ```mermaid
 graph TD
