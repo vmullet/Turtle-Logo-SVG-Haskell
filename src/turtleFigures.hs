@@ -15,6 +15,22 @@ drawSquare = execProg [
                         ]
                       ]
 
+-- Function to draw a square (Example with a dynamic Repeat order)
+drawSquare2 :: World
+drawSquare2 = execProg [
+                        Build (500,500),
+                        Declare
+                        [
+                          "length" := Val 150,
+                          "count" := Val 5
+                        ],
+                        Repeat (Var "count" :-: Val 1)
+                        [
+                          MF (Var "length"),
+                          TL (Val 90)
+                        ]
+                      ]
+
 -- Function to draw any regular polygon whatever the number of sides
 drawRegularPolygon :: World
 drawRegularPolygon = execProg [
