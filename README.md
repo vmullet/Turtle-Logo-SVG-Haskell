@@ -121,3 +121,5 @@ Then, to export as a SVG file, you have to call this function like this :
 
     main = do
     writeWorldToSVG drawSquare "..\\svg\\square.svg"
+    
+*N.B : You can find more examples in turtleFigures.hs file*
