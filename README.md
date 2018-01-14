@@ -66,7 +66,7 @@ The turtle can receive the following orders :
 |Ink (Color)            |Set Pen Color             |Ink (200,100,50)
 |Stroke(Int)            |Set Pen Width             |Stroke 10
 |Clear                  |Clear screen              |Clear
-|Declare [Statements]   |Set Var/Functions         |Declare <br>[<br>Var "myVar := Val 10,<br>Var "myFunc" := \x -> x+1 <br> ]
+|Declare [Statements]   |Set Var/Functions         |Declare <br>[<br>Var "myVar := Val 10,<br>Var "myFunc" :-> \x -> x+1 <br> ]
 |IF Expr ([Then],[Else])| The IF condition         |IF (Var "myVar" :==: Val 30)<br>(<br>[MF (Val 30),TL (Val 90)],-(*iftrue*)-<br>[MF (Val 50)] -(*ifnot*)-<br>)
 |Repeat Expr [Order]    | The FOR loop             |Repeat (Val "myVar")<br>[<br>MF (Val 50),<br>TR(Val 90)<br>]
 
