@@ -77,7 +77,7 @@ drawMill = execProg [
 
 ----------------------------- The KOCH SnowFlake and some variants ------------------------------------
 
--- Recusrive part of the regular snowflake
+-- Recursive part of the regular snowflake
 fractaleKoch :: Expr -> Order
 fractaleKoch count = IF (count :==: Val 0) ([MF (Var "baseLength" :/: Val 3)],ifnot)
                      where  recur = fractaleKoch (count :-: Val 1) -- Decrease currentN
@@ -228,7 +228,7 @@ drawQuadSpiral = execProg [
                         [
                           "length" := Val 500,
                           "depth" := Val 100, -- Depth of the spiral (number of nested squares)
-                          "reduceSquare" :-> (\x -> x - x `div` 20) -- Square length reduced of 5% every nested dquare
+                          "reduceSquare" :-> (\x -> x - x `div` 20) -- Square length reduced of 5% every nested square
                         ],
                         Ink (80,0,80),
                         Stroke 4,
