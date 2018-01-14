@@ -75,9 +75,11 @@ drawMill = execProg [
                     ]
                     where halfLength = Function "halfReduce" (Var "wingLength")
 
------------------------------ The Koch SnowFlake and some variants ------------------------------------
+----------------------------- The KOCH SnowFlake and some variants ------------------------------------
+
+-- Recusrive part of the regular snowflake
 fractaleKoch :: Expr -> Order
-fractaleKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
+fractaleKoch count = IF (count :==: Val 0) ([MF (Var "baseLength" :/: Val 3)],ifnot)
                      where  recur = fractaleKoch (count :-: Val 1) -- Decrease currentN
                             ifnot = [
                                       recur,
@@ -89,8 +91,9 @@ fractaleKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
                                       recur
                                     ]
 
+-- Recursive part of the quadratic snowflake
 quadraKoch :: Expr -> Order
-quadraKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
+quadraKoch count = IF (count :==: Val 0) ([MF (Var "baseLength" :/: Val 3)],ifnot)
                      where  recur = quadraKoch (count :-: Val 1) -- Decrease currentN
                             ifnot = [
                                       recur,
@@ -104,8 +107,9 @@ quadraKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
                                       recur
                                     ]
 
+-- Recursive part of the pointed snowflake
 pointedKoch :: Expr -> Order
-pointedKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
+pointedKoch count = IF (count :==: Val 0) ([MF (Var "baseLength" :/: Val 3)],ifnot)
                      where  recur = fractaleKoch (count :-: Val 1) -- Decrease currentN
                             ifnot = [
                                       recur,
@@ -117,8 +121,9 @@ pointedKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
                                       recur
                                     ]
 
+-- Recursive part of the inverted snowflake
 invertedKoch :: Expr -> Order
-invertedKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
+invertedKoch count = IF (count :==: Val 0) ([MF (Var "baseLength" :/: Val 3)],ifnot)
                      where  recur = fractaleKoch (count :-: Val 1) -- 
                             ifnot = [
                                       recur,
@@ -130,18 +135,18 @@ invertedKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
                                       recur
                                     ]
 
--- Functions to draw snowflakes based on functions above
+-- Functions to draw snowflakes based on recursive functions above
+
+-- The regular Koch snowflake
 drawSnowFlake :: World
 drawSnowFlake = execProg  [
                             Build (1200,1200),
                             Declare
                             [
                               "constN" := Val 4, -- The n generation desired
-                              "baseLength" := Val 600, -- The total fractale length
+                              "baseLength" := Val 90, -- The total fractale length
                               -- For calculation, mustn't be edited
-                              "3powerN" :-> (\x -> 3^x),
-                              "currentN" := Var "constN", -- The current value of n (initialized to constN value)
-                              "fractLength" := (Var "baseLength" :/: (Function "3powerN" (Var "constN"))) -- The length of every fractale fragment
+                              "currentN" := Var "constN" -- The current value of n (initialized to constN value)
                             ],
                             Ink (150,200,255),
                             Repeat (Val 3)
@@ -152,17 +157,16 @@ drawSnowFlake = execProg  [
                             ]
                           ]
 
+-- The quadratic Koch snowflake
 drawQuadraSnowFlake :: World
 drawQuadraSnowFlake = execProg  [
                             Build (1500,1500),
                             Declare
                             [
                               "constN" := Val 4, -- The n generation desired
-                              "baseLength" := Val 400, -- The total fractale length
+                              "baseLength" := Val 20, -- The total fractale length
                               -- For calculation, shouldn't be edited
-                              "3powerN" :-> (\x -> 3^x),
-                              "currentN" := Var "constN", -- The current value of n (initialized to constN value)
-                              "fractLength" := (Var "baseLength" :/: (Function "3powerN" (Var "constN"))) -- The length of every fractale fragment
+                              "currentN" := Var "constN" -- The current value of n (initialized to constN value)
                             ],
                             Ink (150,200,255),
                             Repeat (Val 4)
@@ -173,17 +177,16 @@ drawQuadraSnowFlake = execProg  [
                             ]
                           ]
 
+-- The pointed Koch snowflake
 drawPointedSnowFlake :: World
 drawPointedSnowFlake = execProg  [
                                     Build (1500,1500),
                                     Declare
                                     [
                                       "constN" := Val 4, -- The n generation desired
-                                      "baseLength" := Val 700, -- The total fractale length
+                                      "baseLength" := Val 30, -- The total fractale length
                                       -- For calculation, mustn't be edited
-                                      "3powerN" :-> (\x -> 3^x),
-                                      "currentN" := Var "constN", -- The current value of n (initialized to constN value)
-                                      "fractLength" := (Var "baseLength" :/: (Function "3powerN" (Var "constN"))) -- The length of every fractale fragment
+                                      "currentN" := Var "constN" -- The current value of n (initialized to constN value)
                                     ],
                                     Ink (150,200,255),
                                     Repeat (Val 4)
@@ -194,17 +197,16 @@ drawPointedSnowFlake = execProg  [
                                     ]
                                   ]
 
+-- The pointed Koch snowflake
 drawInvertedSnowFlake :: World
 drawInvertedSnowFlake = execProg  [
-                                    Build (1200,1200),
+                                    Build (1300,1300),
                                     Declare
                                     [
                                       "constN" := Val 4, -- The n generation desired
-                                      "baseLength" := Val 1600, -- The total fractale length
+                                      "baseLength" := Val 70, -- The total fractale length
                                       -- For calculation, mustn't be edited
-                                      "3powerN" :-> (\x -> 3^x),
-                                      "currentN" := Var "constN", -- The current value of n (initialized to constN value)
-                                      "fractLength" := (Var "baseLength" :/: (Function "3powerN" (Var "constN"))) -- The length of every fractale fragment
+                                      "currentN" := Var "constN" -- The current value of n (initialized to constN value)
                                     ],
                                     Ink (150,200,255),
                                     Repeat (Val 4)
@@ -215,9 +217,10 @@ drawInvertedSnowFlake = execProg  [
                                     ]
                                   ]
 
----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
 
--- Functions to draw spirals (Quadratic or Circular)
+----------------------------- FUNCTIONS to draw spirals (Quadratic or Circular) -----------------------------------------
+
 drawQuadSpiral :: World
 drawQuadSpiral = execProg [
                         Build (1200,1200),
@@ -237,10 +240,7 @@ drawQuadSpiral = execProg [
                             MF (Var "length"),
                             TR (Val 90)
                           ],
-                          Declare
-                          [
-                            "length" := Function "reduceSquare" (Var "length") -- Update length variable
-                          ]
+                          Declare [ "length" := Function "reduceSquare" (Var "length") ] -- Update length variable
                         ]
                       ]
 
@@ -259,14 +259,13 @@ drawCircSpiral = execProg [
                             [
                               TL (Val 30),
                               MF (Var "space"),
-                              Declare
-                              [
-                                "space" := ((Var "space") :+: Var "increase")
-                              ]
+                              Declare [ "space" := ((Var "space") :+: Var "increase") ] -- Increase space variable
                             ]
                           ]
 
--------------------- FUNCTIONS to draw the triangle of Sierpinski --------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+
+------------------------------- FUNCTIONS to draw the triangle of Sierpinski --------------------------------------------
 
 sierpinski :: Expr -> Expr -> Order
 sierpinski n long = IF (n :==: Val 0) (iftrue,ifnot)
@@ -298,8 +297,9 @@ drawSierpinski = execProg [
                             sierpinski (Var "n") (Var "length")
                           ]
 
--------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 
+-- Main to test all functions above (svg will be generated in svg folder)
 main = do
     writeWorldToSVG drawSquare "..\\svg\\square.svg"
     writeWorldToSVG drawRegularPolygon "..\\svg\\polygReg.svg"

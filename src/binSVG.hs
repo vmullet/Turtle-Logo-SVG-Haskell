@@ -36,7 +36,7 @@ headerSVG = "<?xml version='1.0' standalone='no'?>\n"
 footerSVG :: String
 footerSVG = "</svg>"
 
--- Function to convert the different abstract types to SVG String
+------------------------------ Functions to convert the different abstract types to SVG String -------------------------------
 canvasToString :: Canvas -> String
 canvasToString (width,height) = "<svg width='" ++ show width ++ "' height='" ++ show height ++ "' version='1.1' xmlns='http://www.w3.org/2000/svg'>\n"
 
@@ -58,10 +58,12 @@ shapeToString (Polygon positions color strokeW) = "<polygon points='" ++ coordAr
 shapeArrayToString :: [Shape] -> String
 shapeArrayToString = foldr ((++) . shapeToString) ""
 
+-------------------------------------------------------------------------------------------------------------------------------
+
 addShapeToScreen :: Shape -> Screen -> Screen
 addShapeToScreen shape (Screen canvas shapes) = Screen canvas (shape : shapes)
 
 
--- Function to write an Image type data to a SVG file
+-- Function to write a Screen type data to a SVG file
 writeScreenToSVG :: Screen -> String -> IO ()
 writeScreenToSVG (Screen canvas shapes) path = writeFile path (headerSVG ++ canvasToString canvas ++ shapeArrayToString shapes ++ footerSVG)
