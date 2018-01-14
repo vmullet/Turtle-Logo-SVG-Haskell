@@ -31,7 +31,7 @@ getRandomSquare (width,_) = do
 -- String : The path of the SVG file to generate
 drawRandomSquares :: Screen -> Int -> String -> IO ()
 drawRandomSquares (Screen canvas shapes) quantity path  | quantity < 0 = error "The number of square to generate must be positive"
-                                                        | quantity > 0= do
+                                                        | quantity > 0 = do
                                                             randomSquare <- getRandomSquare canvas
                                                             drawRandomSquares (Screen canvas (randomSquare:shapes)) (quantity - 1) path
                                                         | otherwise = writeScreenToSVG (Screen canvas shapes) path
