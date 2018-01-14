@@ -197,7 +197,7 @@ drawPointedSnowFlake = execProg  [
                                     ]
                                   ]
 
--- The pointed Koch snowflake
+-- The inverted Koch snowflake
 drawInvertedSnowFlake :: World
 drawInvertedSnowFlake = execProg  [
                                     Build (1300,1300),
