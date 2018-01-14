@@ -9,27 +9,33 @@ getRandomColor = do
     blue <- randomRIO(0,255)
     return (red,green,blue)
 
+-- Function to generate a random width stroke
+getRandomStroke :: IO (Int)
+getRandomStroke = do
+    stroke <- randomRIO(1,10)
+    return stroke
+
 -- Function to generate a Random Square
 getRandomSquare :: Canvas -> IO (Shape)
 getRandomSquare (width,_) = do
     sqPos <- randomRIO(0,width) -- X and Y of the randomSquare
     sqW <- randomRIO(1,width - sqPos) -- Width of the randomSquare
     randomColor <- getRandomColor
-    return (Rectangle (sqPos,sqPos) sqW sqW randomColor)
+    randomStroke <- getRandomStroke
+    return (Rectangle (sqPos,sqPos) sqW sqW randomColor randomStroke)
 
 
--- Function to generate X random squares on a given canvas (recursive)
--- Canvas: The canvas where the squares are drawn
--- [Shape] : The array of shapes generated (empty when executed first time : [])
+-- Function to generate X random squares on a given canvas
+-- Screen : The screen where the squares will be drawn (will be filled recursively)
 -- Int : The number of squares to generate
-drawRandomSquares :: Canvas -> [Shape] -> Int -> IO ()
-drawRandomSquares canvas shapes quantity = do
-    if (quantity > 0) then do
-      randomSquare <- getRandomSquare canvas
-      drawRandomSquares canvas (randomSquare:shapes) (quantity - 1)
-    else 
-        writeImageToSVG (Image canvas shapes) "randomSquares.svg"
+-- String : The path of the SVG file to generate
+drawRandomSquares :: Screen -> Int -> String -> IO ()
+drawRandomSquares (Screen canvas shapes) quantity path  | quantity < 0 = error "The number of square to generate must be positive"
+                                                        | quantity > 0= do
+                                                            randomSquare <- getRandomSquare canvas
+                                                            drawRandomSquares (Screen canvas (randomSquare:shapes)) (quantity - 1) path
+                                                        | otherwise = writeScreenToSVG (Screen canvas shapes) path
 
 
 main = do
-  drawRandomSquare (1000,1000) [] 10
+  drawRandomSquares (Screen (1000,1000) []) 10 "..\\svg\\randomSquares.svg"

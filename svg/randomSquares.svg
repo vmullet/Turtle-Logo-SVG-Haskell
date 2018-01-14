@@ -1,13 +1,13 @@
 <?xml version='1.0' standalone='no'?>
 <svg width='1000' height='1000' version='1.1' xmlns='http://www.w3.org/2000/svg'>
-<rect x='780' y='780' width='61' height='61' stroke='rgb(238, 52, 151)' fill='transparent' stroke-width='5'/>
-<rect x='966' y='966' width='32' height='32' stroke='rgb(20, 36, 184)' fill='transparent' stroke-width='5'/>
-<rect x='598' y='598' width='89' height='89' stroke='rgb(213, 187, 240)' fill='transparent' stroke-width='5'/>
-<rect x='637' y='637' width='83' height='83' stroke='rgb(201, 49, 12)' fill='transparent' stroke-width='5'/>
-<rect x='417' y='417' width='363' height='363' stroke='rgb(103, 76, 100)' fill='transparent' stroke-width='5'/>
-<rect x='256' y='256' width='10' height='10' stroke='rgb(224, 182, 159)' fill='transparent' stroke-width='5'/>
-<rect x='279' y='279' width='622' height='622' stroke='rgb(249, 71, 155)' fill='transparent' stroke-width='5'/>
-<rect x='894' y='894' width='83' height='83' stroke='rgb(188, 61, 132)' fill='transparent' stroke-width='5'/>
-<rect x='303' y='303' width='510' height='510' stroke='rgb(166, 123, 23)' fill='transparent' stroke-width='5'/>
-<rect x='794' y='794' width='37' height='37' stroke='rgb(106, 86, 251)' fill='transparent' stroke-width='5'/>
+<rect x='355' y='355' width='131' height='131' stroke='rgb(42, 89, 60)' fill='transparent' stroke-width='5'/>
+<rect x='621' y='621' width='359' height='359' stroke='rgb(138, 48, 232)' fill='transparent' stroke-width='1'/>
+<rect x='804' y='804' width='190' height='190' stroke='rgb(205, 193, 241)' fill='transparent' stroke-width='4'/>
+<rect x='124' y='124' width='606' height='606' stroke='rgb(133, 25, 187)' fill='transparent' stroke-width='9'/>
+<rect x='394' y='394' width='145' height='145' stroke='rgb(164, 125, 42)' fill='transparent' stroke-width='9'/>
+<rect x='850' y='850' width='98' height='98' stroke='rgb(226, 48, 186)' fill='transparent' stroke-width='10'/>
+<rect x='188' y='188' width='347' height='347' stroke='rgb(125, 148, 17)' fill='transparent' stroke-width='2'/>
+<rect x='60' y='60' width='753' height='753' stroke='rgb(119, 135, 1)' fill='transparent' stroke-width='4'/>
+<rect x='101' y='101' width='793' height='793' stroke='rgb(20, 102, 239)' fill='transparent' stroke-width='6'/>
+<rect x='300' y='300' width='410' height='410' stroke='rgb(85, 144, 126)' fill='transparent' stroke-width='9'/>
 </svg>
