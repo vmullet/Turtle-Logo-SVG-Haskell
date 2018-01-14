@@ -68,9 +68,9 @@ drawMill = execProg [
                           MF halfLength
                         ],
                         TR (Val 90),
-                        LP False,
+                        LP False, -- Disable pen
                         MB halfLength,
-                        LP True
+                        LP True -- Enable pen
                       ]
                     ]
                     where halfLength = Function "halfReduce" (Var "wingLength")
@@ -130,7 +130,7 @@ invertedKoch count = IF (count :==: Val 0) ([MF (Var "fractLength")],ifnot)
                                       recur
                                     ]
 
--- Function to draw the snowflake based on the fractaleKoch function above
+-- Functions to draw snowflakes based on functions above
 drawSnowFlake :: World
 drawSnowFlake = execProg  [
                             Build (1200,1200),
