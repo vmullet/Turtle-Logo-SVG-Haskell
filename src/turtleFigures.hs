@@ -144,7 +144,7 @@ drawSnowFlake = execProg  [
                             Declare
                             [
                               "constN" := Val 4, -- The n generation desired
-                              "baseLength" := Val 90, -- The total fractale length
+                              "baseLength" := Val 21, -- The total fractale length
                               -- For calculation, mustn't be edited
                               "currentN" := Var "constN" -- The current value of n (initialized to constN value)
                             ],
