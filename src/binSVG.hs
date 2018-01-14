@@ -26,7 +26,7 @@ data Shape = Rectangle Coordinate Int Int Color Int
             | Polygon [Coordinate] Color Int
             deriving Show
 
--- Image is an array of Shape
+-- Screen contains an array of shapes
 data Screen = Screen Canvas [Shape] deriving Show
 
 -- Function for static parts of a SVG file
