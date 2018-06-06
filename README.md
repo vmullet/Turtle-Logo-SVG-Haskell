@@ -35,8 +35,6 @@ The **Turtle Language** is based on a global data type called **World** where th
 
 This is a global schema to resume the data structure of the language.
 
-![](https://i.imgur.com/rvlm0D0.jpg)
-
 ```mermaid
 graph TD
 A[World] --> B(Turtle)
@@ -75,8 +73,6 @@ The turtle can receive the following orders :
 
 The language supports the notion of variables/ functions/ values described as expressions (**Expr**)
 You can combine any expressions by using operators like on the following schema :
-
-![](https://i.imgur.com/8E8WVLk.jpg)
 
 ```mermaid
 graph TD
